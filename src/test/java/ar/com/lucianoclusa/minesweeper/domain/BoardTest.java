@@ -3,12 +3,12 @@ package ar.com.lucianoclusa.minesweeper.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static ar.com.lucianoclusa.minesweeper.domain.Board.MAX_COLUMN_SIZE;
+import static ar.com.lucianoclusa.minesweeper.domain.Board.MAX_ROW_SIZE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static ar.com.lucianoclusa.minesweeper.configuration.ApplicationConfig.MAX_ROW_SIZE;
-import static ar.com.lucianoclusa.minesweeper.configuration.ApplicationConfig.MAX_COLUMN_SIZE;
 
 class BoardTest {
 
@@ -88,7 +88,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Given a new board When isCleared is called Then return false")
+    @DisplayName("Given a new board When isOpened is called Then return false")
     void testBoardNotCleared() {
         int columns = 10;
         int rows = 10;
@@ -100,34 +100,34 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("Given a board with all non mined slots cleared When isCleared is called Then return true")
+    @DisplayName("Given a board with all non mined slots cleared When isOpened is called Then return true")
     void testNonMinedBoardCleared() {
         Board board = new Board(2, 2, 1);
         board.putMine(0,0);
-        board.getSlot(0,1).setCleared(true);
-        board.getSlot(1,0).setCleared(true);
-        board.getSlot(1,1).setCleared(true);
+        board.getSlot(0,1).open();
+        board.getSlot(1,0).open();
+        board.getSlot(1,1).open();
 
         assertTrue(board.isCleared());
     }
 
     @Test
-    @DisplayName("Given a board with non mined slots cleared and one mine not cleared When isCleared is called Then return true")
+    @DisplayName("Given a board with non mined slots cleared and one mine not cleared When isOpened is called Then return true")
     void testMinedBoardCleared() {
         Board board = new Board(2, 2, 0);
         board.putMine(0,0);
-        board.getSlots().stream().filter(slot -> !slot.isMined()).forEach(slot -> slot.setCleared(true));
+        board.getSlots().stream().filter(slot -> !slot.isMined()).forEach(slot -> slot.open());
 
         assertTrue(board.isCleared());
     }
 
     @Test
-    @DisplayName("Given a board with one non mined slots not cleared When isCleared is called Then return false")
+    @DisplayName("Given a board with one non mined slots not cleared When isOpened is called Then return false")
     void testMinedBoardNotCleared() {
         Board board = new Board(2, 2, 0);
         board.putMine(0,0);
         board.putMine(0,1);
-        board.getSlot(1,0).setCleared(true);
+        board.getSlot(1,0).open();
 
 
         assertFalse(board.isCleared());
@@ -153,7 +153,7 @@ class BoardTest {
 
         Slot slot = board.getSlot(0, 0);
 
-        assertFalse(slot.isCleared());
+        assertFalse(slot.isOpened());
         assertFalse(slot.isFlagged());
         assertFalse(slot.isQuestioned());
         assertTrue(slot.isMined());
@@ -168,11 +168,21 @@ class BoardTest {
 
         Slot slot = board.getSlot(1, 1);
 
-        assertFalse(slot.isCleared());
+        assertFalse(slot.isOpened());
         assertFalse(slot.isFlagged());
         assertFalse(slot.isQuestioned());
         assertFalse(slot.isMined());
         assertEquals(1, slot.getColumn());
         assertEquals(1, slot.getRow());
+    }
+
+    @Test
+    @DisplayName("Given a new board when openAll is called Then all slots shuold  be opened")
+    void testOpenAll() {
+        Board board = new Board(2, 2, 1);
+
+        board.openAllSlots();
+
+        assertTrue(board.getSlots().stream().allMatch(Slot::isOpened));
     }
 }

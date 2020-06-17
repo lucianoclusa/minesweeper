@@ -4,13 +4,12 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ar.com.lucianoclusa.minesweeper.configuration.ApplicationConfig.MAX_ROW_SIZE;
-import static ar.com.lucianoclusa.minesweeper.configuration.ApplicationConfig.MAX_COLUMN_SIZE;
-
 public class Board {
+
+    public static final int MAX_COLUMN_SIZE = 1000;
+    public static final int MAX_ROW_SIZE = 1000;
 
     private final int numberOfRows;
     private final int numberOfColumns;
@@ -50,7 +49,7 @@ public class Board {
         }
     }
 
-    Slot getSlot(int row, int col) {
+    public Slot getSlot(int row, int col) {
         Assert.isTrue(isValidCoordinates(row, col), "Coordinates are out of range");
         return this.slots.get(row * this.numberOfColumns + col);
     }
@@ -93,37 +92,8 @@ public class Board {
         return numberOfMines;
     }
 
-    @Override
-    public String toString() {
-        String[] output = new String[numberOfRows];
-        for (int row=0; row < numberOfRows; row++) {
-            StringBuilder builder = new StringBuilder();
-            for (int col=0; col < numberOfColumns; col++) {
-                Slot current = getSlot(row, col);
-                builder.append(getCharForSlot(current));
-            }
-            output[row] = builder.toString();
-        }
-        return String.join("\n", output);
-    }
-
     boolean isCleared() {
-        return slots.stream().noneMatch((slot -> !slot.isCleared() && !slot.isMined()));
-    }
-
-    private char getCharForSlot(Slot slot) {
-        if (slot.isFlagged()) {
-            return 'F';
-        } else if (slot.isQuestioned()) {
-            return '?';
-        } if (slot.isCleared() && slot.isMined()) {
-            return 'X';
-        } else if (slot.isCleared()) {
-            int mineCount = (int) Objects.requireNonNull(getNeighbors(slot)).stream().filter((Slot::isMined)).count();
-            return String.valueOf(mineCount).charAt(0);
-        } else {
-            return '+';
-        }
+        return slots.stream().noneMatch((slot -> !slot.isOpened() && !slot.isMined()));
     }
 
     List<Slot> getNeighbors(Slot slot) {
@@ -132,5 +102,9 @@ public class Board {
 
     public List<Slot> getSlots() {
         return slots;
+    }
+
+    void openAllSlots() {
+        slots.forEach(Slot::open);
     }
 }

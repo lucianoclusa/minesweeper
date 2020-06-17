@@ -6,7 +6,8 @@ public class Slot {
     private final int column;
 
     private boolean isMined;
-    private boolean isCleared;
+    private boolean isOpened;
+    private boolean isExploded;
     private boolean isFlagged;
     private boolean isQuestioned;
 
@@ -32,15 +33,15 @@ public class Slot {
         isMined = true;
     }
 
-    boolean isCleared() {
-        return isCleared;
+    public boolean isOpened() {
+        return isOpened;
     }
 
-    public void setCleared(boolean cleared) {
-        isCleared = cleared;
+    public void open() {
+        isOpened = true;
     }
 
-    boolean isFlagged() {
+    public boolean isFlagged() {
         return isFlagged;
     }
 
@@ -58,5 +59,13 @@ public class Slot {
 
     boolean isNeighborOf(Slot anotherSlot) {
         return this != anotherSlot && Math.abs(this.column - anotherSlot.column) <= 1 && Math.abs(this.row - anotherSlot.row) <= 1;
+    }
+
+    public boolean isExploded() {
+        return isExploded;
+    }
+
+    public void setExploded(boolean exploded) {
+        isExploded = exploded;
     }
 }
