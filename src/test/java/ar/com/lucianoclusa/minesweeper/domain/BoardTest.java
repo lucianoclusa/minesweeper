@@ -104,9 +104,9 @@ class BoardTest {
     void testNonMinedBoardCleared() {
         Board board = new Board(2, 2, 1);
         board.putMine(0,0);
-        board.getSlot(0,1).open();
-        board.getSlot(1,0).open();
-        board.getSlot(1,1).open();
+        board.openSlot(board.getSlot(0,1));
+        board.openSlot(board.getSlot(1,0));
+        board.openSlot(board.getSlot(1,1));
 
         assertTrue(board.isCleared());
     }
@@ -116,7 +116,7 @@ class BoardTest {
     void testMinedBoardCleared() {
         Board board = new Board(2, 2, 0);
         board.putMine(0,0);
-        board.getSlots().stream().filter(slot -> !slot.isMined()).forEach(slot -> slot.open());
+        board.getSlots().stream().filter(slot -> !slot.isMined()).forEach(board::openSlot);
 
         assertTrue(board.isCleared());
     }
@@ -127,7 +127,7 @@ class BoardTest {
         Board board = new Board(2, 2, 0);
         board.putMine(0,0);
         board.putMine(0,1);
-        board.getSlot(1,0).open();
+        board.openSlot(board.getSlot(1,0));
 
 
         assertFalse(board.isCleared());
@@ -181,7 +181,7 @@ class BoardTest {
     void testOpenAll() {
         Board board = new Board(2, 2, 1);
 
-        board.openAllSlots();
+        board.revealAllSlots();
 
         assertTrue(board.getSlots().stream().allMatch(Slot::isOpened));
     }

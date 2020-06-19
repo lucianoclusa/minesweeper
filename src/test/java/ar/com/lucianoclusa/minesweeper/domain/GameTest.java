@@ -94,28 +94,4 @@ class GameTest {
         assertFalse(game.getBoard().getSlot(2, 1).isOpened());
         assertFalse(game.getBoard().getSlot(2, 2).isOpened());
     }
-
-    @Test
-    @DisplayName("Given a flagged slot When is questioned Then unflag and question it")
-    void testQuestionSlot() {
-        Game game = new Game(new Board(2,2,1));
-        game.getBoard().getSlot(0,0).setFlagged(true);
-
-        game.questionSlot(0, 0);
-
-        assertTrue(game.getBoard().getSlot(0,0).isQuestioned());
-        assertFalse(game.getBoard().getSlot(0,0).isFlagged());
-    }
-
-    @Test
-    @DisplayName("Given a questioned slot When is flagged Then unquestion and flag it")
-    void testFlagSlot() {
-        Game game = new Game(new Board(2,2,1));
-        game.getBoard().getSlot(0,0).setQuestioned(true);
-
-        game.flagSlot(0, 0);
-
-        assertTrue(game.getBoard().getSlot(0,0).isFlagged());
-        assertFalse(game.getBoard().getSlot(0,0).isQuestioned());
-    }
 }

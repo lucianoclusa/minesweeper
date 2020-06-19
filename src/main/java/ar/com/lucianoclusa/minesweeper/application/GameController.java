@@ -9,6 +9,7 @@ import ar.com.lucianoclusa.minesweeper.application.model.MoveRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,15 @@ public class GameController{
     ){
         notNull(request.getMovementType(),"Not a valid movement_type (OPEN, FLAG or QUESTION).");
         Game game = gameManager.makeMove(request, userId, gameId);
+        return new ResponseEntity<>(new GameResponse(game), HttpStatus.OK);
+    }
+
+    @GetMapping("/{gameId}")
+    public ResponseEntity<GameResponse> getGame(
+            @RequestHeader("user-id") String userId,
+            @PathVariable String gameId
+    ){
+        Game game = gameManager.getGame(userId, gameId);
         return new ResponseEntity<>(new GameResponse(game), HttpStatus.OK);
     }
 }

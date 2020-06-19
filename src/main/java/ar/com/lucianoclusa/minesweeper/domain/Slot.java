@@ -1,22 +1,40 @@
 package ar.com.lucianoclusa.minesweeper.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Slot {
 
     private final int row;
     private final int column;
-
     private boolean isMined;
-    private boolean isOpened;
-    private boolean isExploded;
-    private boolean isFlagged;
-    private boolean isQuestioned;
+    private String state;
 
-
-    Slot(int row, int column) {
+    public Slot(int column, int row) {
         this.row = row;
         this.column = column;
+        this.state = SlotState.CLOSED.value;
     }
 
+    boolean isNeighborOf(Slot anotherSlot) {
+        return this != anotherSlot && Math.abs(this.column - anotherSlot.column) <= 1 && Math.abs(this.row - anotherSlot.row) <= 1;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public boolean isFlagged() {
+        return SlotState.FLAGGED.value.equals(this.state);
+    }
+
+    public boolean isQuestioned() {
+        return SlotState.QUESTIONED.value.equals(this.state);
+    }
+
+    public boolean isClosed() {
+        return SlotState.CLOSED.value.equals(this.state);
+    }
     public int getRow() {
         return row;
     }
@@ -25,47 +43,50 @@ public class Slot {
         return column;
     }
 
-    boolean isMined() {
+    public boolean isMined() {
         return isMined;
     }
 
-    void setMined() {
-        isMined = true;
+    public void setMined(boolean isMined) {
+        this.isMined = isMined;
     }
 
     public boolean isOpened() {
-        return isOpened;
+        return !isFlagged() && !isQuestioned() && !isClosed();
     }
 
-    public void open() {
-        isOpened = true;
+    public String getState() {
+        return state;
     }
 
-    public boolean isFlagged() {
-        return isFlagged;
-    }
+    public enum SlotState {
+        CLOSED("C"),
+        FLAGGED("F"),
+        QUESTIONED("?"),
+        EXPLODED("X"),
+        BOMB_REVEALED("B");
 
-    public void setFlagged(boolean flagged) {
-        isFlagged = flagged;
-    }
+        private final String value;
 
-    public boolean isQuestioned() {
-        return isQuestioned;
-    }
+        SlotState(String value) {
+            this.value = value;
+        }
 
-    public void setQuestioned(boolean questioned) {
-        isQuestioned = questioned;
-    }
+        // Reverse-lookup map for getting a day from an abbreviation
+        private static final Map<String, SlotState> lookup = new HashMap<>();
 
-    boolean isNeighborOf(Slot anotherSlot) {
-        return this != anotherSlot && Math.abs(this.column - anotherSlot.column) <= 1 && Math.abs(this.row - anotherSlot.row) <= 1;
-    }
+        static {
+            for (SlotState state : SlotState.values()) {
+                lookup.put(state.value, state);
+            }
+        }
 
-    public boolean isExploded() {
-        return isExploded;
-    }
+        public static SlotState get(String value) {
+            return lookup.get(value);
+        }
 
-    public void setExploded(boolean exploded) {
-        isExploded = exploded;
+        public String getValue() {
+            return value;
+        }
     }
 }

@@ -4,6 +4,7 @@ import ar.com.lucianoclusa.minesweeper.application.model.GameResponse;
 import ar.com.lucianoclusa.minesweeper.domain.Board;
 import ar.com.lucianoclusa.minesweeper.domain.Game;
 import ar.com.lucianoclusa.minesweeper.domain.GameState;
+import ar.com.lucianoclusa.minesweeper.domain.Slot;
 import ar.com.lucianoclusa.minesweeper.domain.service.GameService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsSecondArg;
 
 import java.io.File;
@@ -57,11 +59,10 @@ class GameControllerTest {
                 .content(content)
                 .header("user-id", "asd-123"))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-
-        GameResponse expectedReturnedGame = new GameResponse(new Game(new Board(3, 3, 0)));
         GameResponse returnedGame = objectMapper.readValue(responseAsString, GameResponse.class);
 
-        assertArrayEquals(expectedReturnedGame.getSlots(), returnedGame.getSlots());
+        boolean allSlotsClosed = returnedGame.getSlots().stream().allMatch(slot -> Slot.SlotState.CLOSED.getValue().equals(slot.getValue()));
+        assertTrue(allSlotsClosed);
         assertEquals(GameState.NOT_STARTED.name(), returnedGame.getState());
     }
 
@@ -97,7 +98,7 @@ class GameControllerTest {
 
         GameResponse returnedGame = objectMapper.readValue(responseAsString, GameResponse.class);
         int arrayExpectedLength = expectedReturnedGame.getBoard().getNumberOfColumns() *  expectedReturnedGame.getBoard().getNumberOfRows();
-        assertEquals(arrayExpectedLength, returnedGame.getSlots().length);
+        assertEquals(arrayExpectedLength, returnedGame.getSlots().size());
         assertEquals(GameState.IN_PROGRESS.name(), returnedGame.getState());
     }
 

@@ -9,6 +9,11 @@ public class Game {
         this.board = board;
         this.state = GameState.NOT_STARTED;
     }
+    public Game(String id, Board board, GameState state) {
+        this.id = id;
+        this.board = board;
+        this.state = state;
+    }
 
     private String id;
     private final Board board;
@@ -24,60 +29,70 @@ public class Game {
     }
 
     public void openSlot(int row, int column) {
-        if(state == GameState.NOT_STARTED) {
-            initGame();
-        }
-
-        Slot slot = board.getSlot(row, column);
-        if(canOpenSlot(slot)) {
-            this.moves++;
-
-            if(slot.isMined()) {
-                slot.open();
-                slot.setExploded(true);
-                finishGame(GameState.LOST);
-                return;
-            } else {
-                openSelfAndNeighborsRecursively(slot);
+        if (isNotFinished()) {
+            if(state == GameState.NOT_STARTED) {
+                initGame();
             }
-            if(board.isCleared()) {
-                finishGame(GameState.WON);
+
+            Slot slot = board.getSlot(row, column);
+            if(canOpenSlot(slot)) {
+                this.moves++;
+
+                if(slot.isMined()) {
+                    board.getSlot(row, column).setState(Slot.SlotState.EXPLODED.getValue());
+                    finishGame(GameState.LOST);
+                    return;
+                } else {
+                    openSelfAndNeighborsRecursively(slot);
+                }
+                if(board.isCleared()) {
+                    finishGame(GameState.WON);
+                }
+            } else {
+                throw new IllegalArgumentException("Can't open opened, flagged or questioned slots");
             }
         } else {
-            throw new IllegalArgumentException("Can't open flagged or questioned  slots");
+            throw new IllegalArgumentException("Game already " + state);
         }
     }
 
     public void flagSlot(int row, int column) {
-        board.getSlot(row, column).setQuestioned(false);
-        board.getSlot(row, column).setFlagged(true);
+        board.getSlot(row, column).setState(Slot.SlotState.FLAGGED.getValue());
     }
 
     public void questionSlot(int row, int column) {
-        board.getSlot(row, column).setFlagged(false);
-        board.getSlot(row, column).setQuestioned(true);
+        board.getSlot(row, column).setState(Slot.SlotState.QUESTIONED.getValue());
+    }
+
+    public void cleanSlot(int row, int column) {
+        Slot slot = board.getSlot(row, column);
+        if (!slot.isFlagged() && !slot.isQuestioned()) {
+            slot.setState(Slot.SlotState.CLOSED.getValue());
+        } else {
+            throw new IllegalArgumentException("Can only clear flagged or questioned slots");
+        }
     }
 
     public void unFlagSlot(int row, int column) {
-        board.getSlot(row, column).setFlagged(false);
+        board.getSlot(row, column).setState(Slot.SlotState.CLOSED.getValue());
     }
 
     public void unQuestionSlot(int row, int column) {
-        board.getSlot(row, column).setQuestioned(false);
+        board.getSlot(row, column).setState(Slot.SlotState.CLOSED.getValue());
     }
 
     private void finishGame(GameState result) {
         this.state = result;
-        board.openAllSlots();
+        board.revealAllSlots();
         finishedAt = LocalDateTime.now();
     }
 
     private boolean canOpenSlot(Slot slot) {
-        return this.isNotFinished() && !slot.isOpened() && !slot.isFlagged();
+        return slot.isClosed();
     }
 
     private void openSelfAndNeighborsRecursively(Slot slot) {
-        slot.open();
+        board.openSlot(slot);
         List<Slot> neighbors = board.getNeighbors(slot);
 
         if (this.isNotFinished() && hasNonMinedNeighbors(neighbors)) {
@@ -122,5 +137,13 @@ public class Game {
 
     public LocalDateTime getFinishedAt() {
         return finishedAt;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

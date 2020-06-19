@@ -34,6 +34,15 @@ public class Board {
         setRandomMines();
     }
 
+    public Board(int numberOfRows, int numberOfColumns, int numberOfMines, List<Slot> slots) {
+        validateBoardSize(numberOfRows, numberOfColumns);
+        this.numberOfRows  = numberOfRows;
+        this.numberOfColumns  = numberOfColumns;
+        this.numberOfMines  = numberOfMines;
+        this.slots = slots;
+
+    }
+
     private void validateBoardSize(int numberOfRows, int numberOfColumns) {
         Assert.isTrue(numberOfRows > 0, "Rows must be greater than 0");
         Assert.isTrue(numberOfColumns > 0, "Columns must be greater than 0");
@@ -44,7 +53,7 @@ public class Board {
     void putMine(int row, int col) {
         Slot slot = getSlot(row, col);
         if(!slot.isMined()) {
-            slot.setMined();
+            slot.setMined(true);
             numberOfMines++;
         }
     }
@@ -54,11 +63,30 @@ public class Board {
         return this.slots.get(row * this.numberOfColumns + col);
     }
 
+    public void openSlot(Slot slot) {
+        int mineCount = (int) getNeighbors(slot).stream().filter(Slot::isMined).count();
+        if (mineCount==0) {
+            slot.setState(" ");
+        } else {
+            slot.setState(String.valueOf(mineCount));
+        }
+    }
+
+    private void revealSlot(Slot slot) {
+        if (slot.isMined()) {
+            if (!Slot.SlotState.EXPLODED.getValue().equals(slot.getState())) {
+                slot.setState(Slot.SlotState.BOMB_REVEALED.getValue());
+            }
+        } else {
+            openSlot(slot);
+        }
+    }
+
     private void createEmptyBoard() {
         slots = new ArrayList<>();
         for (int row=0; row<numberOfRows; row++) {
             for (int column=0; column<numberOfColumns; column++) {
-                slots.add(new Slot(row, column));
+                slots.add(new Slot(column, row));
             }
         }
     }
@@ -66,14 +94,12 @@ public class Board {
     private void setRandomMines() {
         int minesSetted = 0;
         while(minesSetted < numberOfMines) {
-            int randomIndex = (int) (Math.random() * numberOfMines);
+            int randomIndex = (int) (Math.random() * slots.size());
             if(!slots.get(randomIndex).isMined()) {
-                slots.get(randomIndex).setMined();
+                slots.get(randomIndex).setMined(true);
                 minesSetted++;
             }
         }
-        slots.stream().limit(numberOfMines).forEach(Slot::setMined);
-
     }
 
     private boolean isValidCoordinates(int row, int col) {
@@ -104,7 +130,8 @@ public class Board {
         return slots;
     }
 
-    void openAllSlots() {
-        slots.forEach(Slot::open);
+    void revealAllSlots() {
+        slots.forEach(this::revealSlot);
     }
+
 }

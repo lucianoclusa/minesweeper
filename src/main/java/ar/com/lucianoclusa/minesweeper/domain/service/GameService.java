@@ -3,12 +3,14 @@ package ar.com.lucianoclusa.minesweeper.domain.service;
 import ar.com.lucianoclusa.minesweeper.domain.Game;
 import ar.com.lucianoclusa.minesweeper.domain.repository.GameRepository;
 import ar.com.lucianoclusa.minesweeper.application.model.MoveRequest;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GameService {
 
     private GameRepository gameRepository;
+
     public GameService(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
@@ -29,7 +31,14 @@ public class GameService {
             case FLAG:
                 game.flagSlot(moveRequest.getRow(), moveRequest.getColumn());
                 break;
+            case CLEAN:
+                game.cleanSlot(moveRequest.getRow(), moveRequest.getColumn());
+                break;
         }
         return gameRepository.update(userId, game);
+    }
+
+    public Game getGame(String userId, String gameId) {
+        return gameRepository.get(userId, gameId);
     }
 }

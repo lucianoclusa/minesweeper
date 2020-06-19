@@ -6,9 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameResponse {
+    @JsonProperty
+    private String id;
     @JsonProperty
     private String state;
     @JsonProperty
@@ -18,35 +22,18 @@ public class GameResponse {
     @JsonProperty("finished_at")
     private LocalDateTime finishedAt;
     @JsonProperty
-    private Integer[] slots;
+    private List<SlotResponse> slots;
 
     public GameResponse(){
         super();
     }
     public GameResponse(Game game) {
+        this.id  = game.getId();
         this.state  = game.getState().toString();
         this.moves  = game.getMoves();
         this.startedAt  = game.getStartedAt();
         this.finishedAt  = game.getFinishedAt();
-        this.slots = game.getBoard().getSlots().stream().map(this::getCharState).toArray(Integer[]::new);
-    }
-
-    private Integer getCharState(Slot slot) {
-        if (slot.isOpened()){
-            if (slot.isExploded()) {
-                return SlotState.EXPLODED.value;
-            } else {
-                return SlotState.CLEARED.value;
-            }
-        } else {
-            if (slot.isFlagged()) {
-                return SlotState.FLAGGED.value;
-            }
-            if (slot.isQuestioned()) {
-                return SlotState.QUESTIONED.value;
-            }
-        }
-        return SlotState.CLOSED.value;
+        this.slots = game.getBoard().getSlots().stream().map(SlotResponse::new).collect(Collectors.toList());
     }
 
     public LocalDateTime getFinishedAt() {
@@ -55,20 +42,6 @@ public class GameResponse {
 
     public void setFinishedAt(LocalDateTime finishedAt) {
         this.finishedAt = finishedAt;
-    }
-
-    enum SlotState {
-        CLOSED(0),
-        CLEARED(1),
-        FLAGGED(2),
-        QUESTIONED(3),
-        EXPLODED(4);
-
-        private final int value;
-
-        SlotState(int value) {
-            this.value = value;
-        }
     }
 
     public String getState() {
@@ -95,11 +68,19 @@ public class GameResponse {
         this.startedAt = startedAt;
     }
 
-    public Integer[] getSlots() {
+    public List<SlotResponse> getSlots() {
         return slots;
     }
 
-    public void setSlots(Integer[] slots) {
+    public void setSlots(List<SlotResponse> slots) {
         this.slots = slots;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

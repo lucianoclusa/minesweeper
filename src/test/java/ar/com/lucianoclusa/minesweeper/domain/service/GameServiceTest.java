@@ -53,7 +53,7 @@ class GameServiceTest {
     void testMakeMoveOpenSlot() {
         String userId = "asd-123";
         MoveRequest move = new MoveRequest(1, 1, MovementType.OPEN);
-        when(gameRepository.get(eq(userId), any())).thenReturn(new Game(new Board(2, 2, 1)));
+        when(gameRepository.get(eq(userId), any())).thenReturn(new Game(new Board(2, 2, 0)));
         when(gameRepository.update(eq(userId), any())).then(returnsSecondArg());
 
         Game result = gameService.makeMove(move, "asd-123", "qwe-456");
@@ -61,7 +61,6 @@ class GameServiceTest {
         Slot slotOpened  = result.getBoard().getSlot(1, 1);
         assertTrue(slotOpened.isOpened());
         assertEquals(1, result.getMoves());
-        assertEquals(GameState.IN_PROGRESS, result.getState());
     }
 
     @Test
