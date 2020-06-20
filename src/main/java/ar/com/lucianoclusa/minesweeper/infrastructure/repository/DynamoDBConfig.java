@@ -6,7 +6,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
@@ -23,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableDynamoDBRepositories(basePackageClasses = GameEntityDynamoDBRepository.class)
+@EnableDynamoDBRepositories(basePackageClasses = GameDynamoDBRepository.class)
 public class DynamoDBConfig {
 
     @Value("${amazon.dynamodb.endpoint}")

@@ -6,6 +6,7 @@ import ar.com.lucianoclusa.minesweeper.domain.Game;
 import ar.com.lucianoclusa.minesweeper.domain.GameState;
 import ar.com.lucianoclusa.minesweeper.domain.Slot;
 import ar.com.lucianoclusa.minesweeper.domain.service.GameService;
+import ar.com.lucianoclusa.minesweeper.domain.service.UserNotValidForGameException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsSecondArg;
 
@@ -51,13 +51,12 @@ class GameControllerTest {
     @Test
     @DisplayName("Given all correct params When create game is called Then return  200")
     void testResponseOK() throws Exception {
-        when(gameService.createGame(eq("asd-123"), any())).then(returnsSecondArg());
+        when(gameService.createGame(eq("testUser"), any())).then(returnsSecondArg());
 
         String content = getStringFromFile("json/newGame/new_game_body.json");
         String responseAsString = mockMvc.perform(post("/")
                 .contentType("application/json")
-                .content(content)
-                .header("user-id", "asd-123"))
+                .content(content))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         GameResponse returnedGame = objectMapper.readValue(responseAsString, GameResponse.class);
 
@@ -74,25 +73,23 @@ class GameControllerTest {
 
         mockMvc.perform(post("/")
                 .contentType("application/json")
-                .content(content)
-                .header("user-id", "asd-123"))
+                .content(content))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Given all correct params When make move is called Then return 200")
-    void testMakeMove() throws Exception {
+    void testMakeMove() throws Exception, UserNotValidForGameException {
         String gameId = "asd-123";
         Game expectedReturnedGame =  new Game(new Board(5, 5, 0));
         expectedReturnedGame.setState(GameState.IN_PROGRESS);
-        when(gameService.makeMove(any(), any(), any())).thenReturn(expectedReturnedGame);
+        when(gameService.makeMove(any(), any())).thenReturn(expectedReturnedGame);
 
         String content = getStringFromFile("json/makeMove/make_move_body.json");
 
         String responseAsString = mockMvc.perform(post("/" + gameId)
                 .contentType("application/json")
-                .content(content)
-                .header("user-id", "asd-123"))
+                .content(content))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
 
@@ -104,15 +101,14 @@ class GameControllerTest {
 
     @Test
     @DisplayName("Given incorrect params When make move is called Then return  400")
-    void testMakeMoveInvalidParams() throws Exception {
+    void testMakeMoveInvalidParams() throws Exception, UserNotValidForGameException {
         String gameId = "asd-123";
-        when(gameService.makeMove(any(), any(), any())).thenReturn(new Game(new Board(1,1,1)));
+        when(gameService.makeMove(any(), any())).thenReturn(new Game(new Board(1,1,1)));
         String content = getStringFromFile("json/makeMove/invalid_make_move_body.json");
 
         mockMvc.perform(post("/" + gameId)
                 .contentType("application/json")
-                .content(content)
-                .header("user-id", "asd-123"))
+                .content(content))
                 .andExpect(status().isBadRequest());
     }
 

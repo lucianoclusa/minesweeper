@@ -5,4 +5,4 @@ import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;
 
 @EnableScan
-interface GameEntityDynamoDBRepository extends CrudRepository<GameEntity, String> {}
+interface GameDynamoDBRepository extends CrudRepository<GameEntity, String> {}

@@ -1,5 +1,6 @@
 {
   "row": 1,
   "column": 3,
-  "movement_type": "OPEN"
+  "movement_type": "OPEN",
+  "user_name": "testUser"
 }

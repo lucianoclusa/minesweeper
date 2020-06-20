@@ -15,6 +15,11 @@ public class Game {
         this.state = state;
     }
 
+    public Game(String id) {
+        this.id = id;
+        this.board = null;
+    }
+
     private String id;
     private final Board board;
     private LocalDateTime startedAt;
@@ -39,7 +44,7 @@ public class Game {
                 this.moves++;
 
                 if(slot.isMined()) {
-                    board.getSlot(row, column).setState(Slot.SlotState.EXPLODED.getValue());
+                    explodeSlot(slot);
                     finishGame(GameState.LOST);
                     return;
                 } else {
@@ -54,6 +59,10 @@ public class Game {
         } else {
             throw new IllegalArgumentException("Game already " + state);
         }
+    }
+
+    private void explodeSlot(Slot slot) {
+        slot.setState(Slot.SlotState.EXPLODED.getValue());
     }
 
     public void flagSlot(int row, int column) {

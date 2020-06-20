@@ -1,5 +1,6 @@
 package ar.com.lucianoclusa.minesweeper.application;
 
+import ar.com.lucianoclusa.minesweeper.domain.service.UserNotValidForGameException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.tomcat.jni.Local;
 import org.springframework.http.HttpHeaders;
@@ -17,9 +18,15 @@ public class RestResponseEntityExceptionHandler
         extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
-    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> handleBadRequest(RuntimeException ex, WebRequest request) {
         RestError error = new RestError(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.toString(), ex.getMessage());
         return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = {UserNotValidForGameException.class})
+    protected ResponseEntity<Object> handleInvalidUser(RuntimeException ex, WebRequest request) {
+        RestError error = new RestError(LocalDateTime.now(), HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.toString(), "User not authorized to play this game");
+        return handleExceptionInternal(ex, error, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
     }
 
     private class RestError {

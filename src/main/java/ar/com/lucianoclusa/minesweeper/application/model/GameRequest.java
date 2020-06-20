@@ -9,6 +9,8 @@ public class GameRequest {
     private int numberOfColumns;
     @JsonProperty("number_of_mines")
     private int numberOfMines;
+    @JsonProperty("user_name")
+    private String userName;
 
     public int getNumberOfRows() {
         return numberOfRows;
@@ -32,5 +34,13 @@ public class GameRequest {
 
     public void setNumberOfMines(int numberOfMines) {
         this.numberOfMines = numberOfMines;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

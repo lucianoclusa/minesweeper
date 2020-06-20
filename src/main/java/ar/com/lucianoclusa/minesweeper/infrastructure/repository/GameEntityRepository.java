@@ -8,26 +8,26 @@ import org.springframework.stereotype.Repository;
 @Repository
 class GameEntityRepository implements GameRepository {
 
-    private final GameEntityDynamoDBRepository gameEntityDynamoDBREpository;
+    private final GameDynamoDBRepository gameEntityDynamoDBREpository;
 
-    public GameEntityRepository(GameEntityDynamoDBRepository gameEntityDynamoDBREpository) {
+    public GameEntityRepository(GameDynamoDBRepository gameEntityDynamoDBREpository) {
         this.gameEntityDynamoDBREpository = gameEntityDynamoDBREpository;
     }
 
     @Override
-    public Game save(String userId, Game game) {
-        GameEntity gameEntity = new GameEntity(game, userId);
+    public Game save(Game game) {
+        GameEntity gameEntity = new GameEntity(game);
         GameEntity savedGameEntity = gameEntityDynamoDBREpository.save(gameEntity);
         return savedGameEntity.toGame();
     }
 
     @Override
-    public Game get(String userId, String gameId) {
+    public Game get(String gameId) {
         return gameEntityDynamoDBREpository.findById(gameId).map(GameEntity::toGame).orElse(null);
     }
 
     @Override
-    public Game update(String userId, Game game) {
-        return this.save(userId, game);
+    public Game update(Game game) {
+        return this.save(game);
     }
 }

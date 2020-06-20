@@ -9,6 +9,8 @@ public class MoveRequest {
     private int column;
     @JsonProperty("movement_type")
     private MovementType movementType;
+    @JsonProperty("user_name")
+    private String userName;
 
     public int getRow() {
         return row;
@@ -30,5 +32,13 @@ public class MoveRequest {
 
     public MoveRequest() {
         super();
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
