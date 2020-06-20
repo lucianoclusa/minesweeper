@@ -1,10 +1,14 @@
 package ar.com.lucianoclusa.minesweeper.application.model;
 
 import ar.com.lucianoclusa.minesweeper.domain.Slot;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class SlotResponse {
+    @Schema(example = "'C'(closed) | 'F'(flagged) | '?'(questioned) | 'X'(exploded) | 'B'(bomb revealed)")
     private String value;
+    @Schema(example = "0")
     private int row;
+    @Schema(example = "1")
     private int column;
 
     public SlotResponse() {

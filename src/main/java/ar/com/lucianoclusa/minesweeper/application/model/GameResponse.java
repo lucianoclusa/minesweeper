@@ -4,6 +4,7 @@ import ar.com.lucianoclusa.minesweeper.domain.Game;
 import ar.com.lucianoclusa.minesweeper.domain.Slot;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,10 +13,13 @@ import java.util.stream.Collectors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameResponse {
     @JsonProperty
+    @Schema(example = "asd-123lj-123ew-dq")
     private String id;
     @JsonProperty
+    @Schema(example = "NOT_STARTED | IN_PROGRESS | WON | LOST")
     private String state;
     @JsonProperty
+    @Schema(example = "0")
     private int moves;
     @JsonProperty("started_at")
     private LocalDateTime startedAt;

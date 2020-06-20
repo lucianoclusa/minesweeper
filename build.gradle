@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ar.com.lucianoclusa'
-version = '0.0.2-SNAPSHOT'
+version = 'v1.0.2'
 sourceCompatibility = '11'
 
 repositories {
@@ -19,6 +19,7 @@ dependencies {
 	implementation 'org.springframework.data:spring-data-releasetrain:Lovelace-SR16'
 	implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.64'
 	implementation 'com.github.derjust:spring-data-dynamodb:5.1.0'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.2.32'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-junit-jupiter:2.23.0'
 }

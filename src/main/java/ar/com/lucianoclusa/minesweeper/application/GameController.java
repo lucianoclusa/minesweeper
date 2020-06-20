@@ -6,15 +6,15 @@ import ar.com.lucianoclusa.minesweeper.domain.Board;
 import ar.com.lucianoclusa.minesweeper.domain.Game;
 import ar.com.lucianoclusa.minesweeper.application.model.GameRequest;
 import ar.com.lucianoclusa.minesweeper.application.model.MoveRequest;
-import ar.com.lucianoclusa.minesweeper.domain.service.UserNotValidForGameException;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.Assert.notNull;
@@ -28,6 +28,7 @@ public class GameController{
         this.gameManager = gameManager;
     }
 
+    @Operation(summary = "Create a new game")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameResponse> createGame(
             @RequestBody GameRequest request
@@ -37,6 +38,7 @@ public class GameController{
         return new ResponseEntity<>(new GameResponse(savedGame), HttpStatus.OK);
     }
 
+    @Operation(summary = "Make a move")
     @PostMapping("/{gameId}")
     public ResponseEntity<GameResponse> makeMove(
             @PathVariable String gameId,
@@ -47,6 +49,7 @@ public class GameController{
         return new ResponseEntity<>(new GameResponse(game), HttpStatus.OK);
     }
 
+    @Operation(summary = "Create a new game")
     @GetMapping("/{gameId}")
     public ResponseEntity<GameResponse> getGame(
             @PathVariable String gameId
