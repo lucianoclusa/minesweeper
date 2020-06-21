@@ -32,8 +32,8 @@ class UserEntityRepository implements UserRepository {
     }
 
     @Override
-    public User update(User user) {
-        return this.save(user);
+    public void update(User user) {
+        this.save(user);
     }
 
     @Override

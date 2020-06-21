@@ -16,12 +16,6 @@ public class Board {
     private int numberOfMines;
     private List<Slot> slots;
 
-    /**
-     * Board constructor for a new game
-     * @param numberOfRows number of rows the board has
-     * @param numberOfColumns number of columns the board has
-     * @param numberOfMines number of mines to be randomly set on board
-     */
     public Board(int numberOfRows, int numberOfColumns, int numberOfMines) {
         validateBoardSize(numberOfRows, numberOfColumns);
         this.numberOfRows  = numberOfRows;
@@ -40,7 +34,6 @@ public class Board {
         this.numberOfColumns  = numberOfColumns;
         this.numberOfMines  = numberOfMines;
         this.slots = slots;
-
     }
 
     private void validateBoardSize(int numberOfRows, int numberOfColumns) {
@@ -133,5 +126,4 @@ public class Board {
     void revealAllSlots() {
         slots.forEach(this::revealSlot);
     }
-
 }

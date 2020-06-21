@@ -137,5 +137,4 @@ public class GameEntity {
             return LocalDateTime.parse(stringValue);
         }
     }
-
 }

@@ -2,7 +2,6 @@ package ar.com.lucianoclusa.minesweeper.application;
 
 import ar.com.lucianoclusa.minesweeper.domain.service.UserNotValidForGameException;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.tomcat.jni.Local;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameTest {
@@ -93,5 +94,70 @@ class GameTest {
         assertFalse(game.getBoard().getSlot(2, 0).isOpened());
         assertFalse(game.getBoard().getSlot(2, 1).isOpened());
         assertFalse(game.getBoard().getSlot(2, 2).isOpened());
+    }
+
+    @Test
+    @DisplayName("Given a game WON When open a slot Then throw exception")
+    void testOpenSlotOnWonGame() {
+        Game game = new Game(new Board(2,2, 2));
+        game.setState(GameState.WON);
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> game.openSlot(1 ,1),
+                "Code didn't throw IllegalArgumentException"
+        );
+        assertTrue(thrown.getMessage().contains("Game already WON"));
+    }
+
+    @Test
+    @DisplayName("Given a game LOST When open a slot Then throw exception")
+    void testOpenSlotOnLostGame() {
+        Game game = new Game(new Board(2,2, 2));
+        game.setState(GameState.LOST);
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> game.openSlot(1 ,1),
+                "Code didn't throw IllegalArgumentException"
+        );
+        assertTrue(thrown.getMessage().contains("Game already LOST"));
+    }
+
+    @Test
+    @DisplayName("Given a flagged slot When it is cleaned Then un-flag that slot")
+    void testCleanFlaggedSlot() {
+        Game game = new Game(new Board(2,2, 2));
+        game.flagSlot(1,1);
+
+        game.cleanSlot(1 ,1);
+
+        assertTrue(game.getBoard().getSlot(1, 1).isClosed());
+        assertFalse(game.getBoard().getSlot(1, 1).isFlagged());
+    }
+
+    @Test
+    @DisplayName("Given a questioned slot When it is cleaned Then un-question that slot")
+    void testCleanQuestionedSlot() {
+        Game game = new Game(new Board(2,2, 2));
+        game.questionSlot(1,1);
+
+        game.cleanSlot(1 ,1);
+
+        assertTrue(game.getBoard().getSlot(1, 1).isClosed());
+        assertFalse(game.getBoard().getSlot(1, 1).isFlagged());
+    }
+
+    @Test
+    @DisplayName("Given a new closed slot When it is cleaned Then throw exception")
+    void testCleanCleanedSlot() {
+        Game game = new Game(new Board(2,2, 2));
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> game.cleanSlot(1 ,1),
+                "Code didn't throw IllegalArgumentException"
+        );
+        assertTrue(thrown.getMessage().contains("Can only clear flagged or questioned slots"));
     }
 }

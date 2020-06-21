@@ -15,17 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 class GameServiceTest {
@@ -42,6 +39,8 @@ class GameServiceTest {
     void setup() {
         MockitoAnnotations.initMocks(this);
         gameService = new GameService(gameRepository, userRepository);
+        when(gameRepository.save(any())).then(returnsFirstArg());
+        when(gameRepository.update(any())).then(returnsFirstArg());
     }
     private String gameId = "qwe-456";
     private User user = new User("asd-123", "testUser", Collections.singletonList(gameId));
@@ -49,7 +48,6 @@ class GameServiceTest {
     @Test
     @DisplayName("Given a valid game When create game Then return saved game")
     void testCreateGame() {
-        when(gameRepository.save(any())).then(returnsFirstArg());
         user.setUserGameIds(null);
         when(userRepository.getByUserName(any())).thenReturn(user);
         Game game = new Game(new Board(2, 2, 1));
@@ -65,8 +63,7 @@ class GameServiceTest {
     @DisplayName("Given a new slot When open slot Then return saved game with slot opened")
     void testMakeMoveOpenSlot() {
         MoveRequest move = new MoveRequest(1, 1, MovementType.OPEN);
-        when(gameRepository.get(eq(gameId))).thenReturn(new Game(new Board(2, 2, 0)));
-        when(gameRepository.update(any())).then(returnsFirstArg());
+        mockRepositoryGetGame(gameId, new Game(new Board(2, 2, 0)));
         when(userRepository.getByUserName(any())).thenReturn(user);
 
         Game result = gameService.makeMove(move,  gameId);
@@ -80,8 +77,7 @@ class GameServiceTest {
     @DisplayName("Given a new slot When flag slot Then return saved game with slot flagged")
     void testMakeMoveFlagSlot() {
         MoveRequest move = new MoveRequest(1, 1, MovementType.FLAG);
-        when(gameRepository.get(gameId)).thenReturn(new Game(new Board(2, 2, 1)));
-        when(gameRepository.update(any())).then(returnsFirstArg());
+        mockRepositoryGetGame(gameId, new Game(new Board(2, 2, 1)));
         when(userRepository.getByUserName(any())).thenReturn(user);
 
         Game result = gameService.makeMove(move, gameId);
@@ -97,8 +93,7 @@ class GameServiceTest {
     @DisplayName("Given a new slot When question slot Then return saved game with slot question")
     void testMakeMoveQuestionSlot() {
         MoveRequest move = new MoveRequest(1, 1, MovementType.QUESTION);
-        when(gameRepository.get(eq(gameId))).thenReturn(new Game(new Board(2, 2, 1)));
-        when(gameRepository.update(any())).then(returnsFirstArg());
+        mockRepositoryGetGame(gameId, new Game(new Board(2, 2, 1)));
         when(userRepository.getByUserName(any())).thenReturn(user);
 
         Game result = gameService.makeMove(move, gameId);
@@ -108,5 +103,43 @@ class GameServiceTest {
         assertFalse(slotQuestioned.isOpened());
         assertEquals(0, result.getMoves());
         assertEquals(GameState.NOT_STARTED, result.getState());
+    }
+
+    @Test
+    @DisplayName("Given a flagged slot When clean slot Then return saved game with slot closed")
+    void testMakeMoveCleanSlot() {
+        MoveRequest move = new MoveRequest(1, 1, MovementType.CLEAN);
+        Game game = new Game(new Board(2, 2, 1));
+        game.flagSlot(1, 1);
+        mockRepositoryGetGame(gameId, game);
+        when(userRepository.getByUserName(any())).thenReturn(user);
+
+        Game result = gameService.makeMove(move, gameId);
+
+        Slot slotQuestioned  = result.getBoard().getSlot(1, 1);
+        assertTrue(slotQuestioned.isClosed());
+        assertFalse(slotQuestioned.isFlagged());
+        assertFalse(slotQuestioned.isOpened());
+        assertEquals(0, result.getMoves());
+        assertEquals(GameState.NOT_STARTED, result.getState());
+    }
+
+    @Test
+    @DisplayName("Given a a game of testUser When anotherUser tries to play Then throw exception")
+    void testOtherUserPlays() {
+        MoveRequest move = new MoveRequest(1, 1, MovementType.QUESTION);
+        mockRepositoryGetGame(gameId, new Game(new Board(2, 2, 1)));
+        User otherUser = new User("asd-123", "testUser", Collections.singletonList(gameId));
+        when(userRepository.getByUserName(user.getUserId())).thenReturn(otherUser);
+
+        assertThrows(
+                UserNotValidForGameException.class,
+                () -> gameService.makeMove(move, gameId),
+                "Code didn't throw IllegalArgumentException"
+        );
+    }
+
+    private void mockRepositoryGetGame(String gameId, Game game) {
+        when(gameRepository.get(gameId)).thenReturn(game);
     }
 }

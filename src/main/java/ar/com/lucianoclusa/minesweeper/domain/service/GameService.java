@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hibernate.validator.internal.util.Contracts.assertTrue;
-
 @Service
 public class GameService {
 

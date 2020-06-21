@@ -76,18 +76,10 @@ public class Game {
     public void cleanSlot(int row, int column) {
         Slot slot = board.getSlot(row, column);
         if (!slot.isFlagged() && !slot.isQuestioned()) {
-            slot.setState(Slot.SlotState.CLOSED.getValue());
-        } else {
             throw new IllegalArgumentException("Can only clear flagged or questioned slots");
+        } else {
+            slot.setState(Slot.SlotState.CLOSED.getValue());
         }
-    }
-
-    public void unFlagSlot(int row, int column) {
-        board.getSlot(row, column).setState(Slot.SlotState.CLOSED.getValue());
-    }
-
-    public void unQuestionSlot(int row, int column) {
-        board.getSlot(row, column).setState(Slot.SlotState.CLOSED.getValue());
     }
 
     private void finishGame(GameState result) {
